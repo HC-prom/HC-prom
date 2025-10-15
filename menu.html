@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitoreo de Presión - Generador y Bancada</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #111827;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        gap: 30px;
+    }
+    h1 {
+        color: #38bdf8;
+    }
+    .container {
+        display: flex;
+        gap: 80px;
+    }
+    .panel {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        width: 280px;
+        box-shadow: 0 0 10px #0ea5e9;
+    }
+    .indicator {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+    .ready {
+        color: #22c55e;
+    }
+    .not-ready {
+        color: #ef4444;
+    }
+    button {
+        background: #0ea5e9;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    button.active {
+        background: #22c55e;
+    }
+    #manometro {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 8px solid #0ea5e9;
+        position: relative;
+        background: #0f172a;
+    }
+    #aguja {
+        position: absolute;
+        width: 3px;
+        height: 60px;
+        background: #ef4444;
+        top: 25px;
+        left: 50%;
+        transform-origin: bottom;
+        transform: rotate(-90deg);
+        transition: transform 0.5s ease;
+    }
+    #alerta {
+        background: #ef4444;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: bold;
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<h1>Monitoreo de Presión - Generador y Bancada</h1>
+
+<div class="container">
+    <div class="panel" id="generadorPanel">
+        <h2>Generador</h2>
+        <div class="indicator" id="estadoGenerador">No Listo</div>
+        <button id="botonGenerador">En Espera</button>
+        <p>Presión: <span id="psiGenerador">0</span> PSI</p>
+    </div>
+
+    <div id="manometro">
+        <div id="aguja"></div>
+    </div>
+
+    <div class="panel" id="bancadaPanel">
+        <h2>Bancada</h2>
+        <div class="indicator" id="estadoBancada">No Listo</div>
+        <button id="botonBancada">En Espera</button>
+        <p>Presión: <span id="psiBancada">0</span> PSI</p>
+    </div>
+</div>
+
+<div id="alerta">⚠️ Error: condición no cumplida</div>
+
+<script>
+/* CONFIGURA AQUÍ TUS DATOS DE ADAFRUIT IO */
+const ADAFRUIT_USERNAME = "TU_USUARIO_ADAFRUIT";
+const ADAFRUIT_KEY = "TU_API_KEY";
+const FEED_GENERADOR = "generador";
+const FEED_BANCADA = "bancada";
+
+/* Función para rotar la aguja del manómetro según la presión */
+function actualizarManometro(valor) {
+    const aguja = document.getElementById("aguja");
+    let angulo = (valor / 100) * 180 - 90; // de -90° a 90°
+    aguja.style.transform = `rotate(${angulo}deg)`;
+}
+
+/* Función para actualizar el estado visual */
+function actualizarEstado(psiGenerador, psiBancada) {
+    const estadoGenerador = document.getElementById("estadoGenerador");
+    const botonGenerador = document.getElementById("botonGenerador");
+    const estadoBancada = document.getElementById("estadoBancada");
+    const botonBancada = document.getElementById("botonBancada");
+    const alerta = document.getElementById("alerta");
+
+    let error = false;
+
+    if (psiGenerador > 80) {
+        estadoGenerador.textContent = "Listo";
+        estadoGenerador.className = "indicator ready";
+        botonGenerador.textContent = "En Marcha";
+        botonGenerador.classList.add("active");
+    } else {
+        estadoGenerador.textContent = "No Listo";
+        estadoGenerador.className = "indicator not-ready";
+        botonGenerador.textContent = "En Espera";
+        botonGenerador.classList.remove("active");
+        error = true;
+    }
+
+    if (psiBancada > 10) {
+        estadoBancada.textContent = "Listo";
+        estadoBancada.className = "indicator ready";
+        botonBancada.textContent = "En Marcha";
+        botonBancada.classList.add("active");
+    } else {
+        estadoBancada.textContent = "No Listo";
+        estadoBancada.className = "indicator not-ready";
+        botonBancada.textContent = "En Espera";
+        botonBancada.classList.remove("active");
+        error = true;
+    }
+
+    // Si ambos están listos
+    if (psiGenerador > 80 && psiBancada > 10) {
+        botonGenerador.textContent = "En Marcha";
+        botonBancada.textContent = "En Marcha";
+        botonGenerador.classList.add("active");
+        botonBancada.classList.add("active");
+    }
+
+    // Mostrar alerta si hay error
+    alerta.style.display = error ? "block" : "none";
+}
+
+/* Simulación o conexión con Adafruit IO */
+async function obtenerDatos() {
+    try {
+        const resGen = await fetch(`https://io.adafruit.com/api/v2/${ADAFRUIT_USERNAME}/feeds/${FEED_GENERADOR}/data?limit=1`, {
+            headers: { "X-AIO-Key": ADAFRUIT_KEY }
+        });
+        const resBan = await fetch(`https://io.adafruit.com/api/v2/${ADAFRUIT_USERNAME}/feeds/${FEED_BANCADA}/data?limit=1`, {
+            headers: { "X-AIO-Key": ADAFRUIT_KEY }
+        });
+
+        const dataGen = await resGen.json();
+        const dataBan = await resBan.json();
+
+        const psiGenerador = parseFloat(dataGen[0].value);
+        const psiBancada = parseFloat(dataBan[0].value);
+
+        document.getElementById("psiGenerador").textContent = psiGenerador.toFixed(1);
+        document.getElementById("psiBancada").textContent = psiBancada.toFixed(1);
+
+        actualizarManometro((psiGenerador + psiBancada) / 2);
+        actualizarEstado(psiGenerador, psiBancada);
+
+    } catch (error) {
+        console.error("Error al obtener datos:", error);
+        document.getElementById("alerta").style.display = "block";
+    }
+}
+
+/* Actualizar cada 5 segundos */
+setInterval(obtenerDatos, 5000);
+obtenerDatos();
+</script>
+
+</body>
+</html>

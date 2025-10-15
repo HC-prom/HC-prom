@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Selección</title>
+  <title>Inicio de sesión</title>
   <style>
     :root{
       --blue: #0ea5e9;
@@ -20,15 +20,11 @@
       margin: 0;
     }
 
-    /* Fondo con imagen y degradado superpuesto */
+    /* Fondo degradado: blanco → azul */
     body {
       display: flex;
       flex-direction: column;
-      background: 
-        linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(14,165,233,0.7) 100%),
-        url('background.jpg');
-      background-size: cover;
-      background-position: center;
+      background: linear-gradient(to bottom, #ffffff 0%, var(--blue) 100%);
       -webkit-font-smoothing: antialiased;
     }
 
@@ -43,21 +39,9 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
     header img {
       height: 40px;
       width: auto;
-    }
-
-    .site-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #fff;
     }
 
     .nav-links a {
@@ -82,7 +66,7 @@
 
     .card {
       width: 100%;
-      max-width: 500px;
+      max-width: 420px;
       background: var(--card-bg);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -104,7 +88,7 @@
       font-size: 13px;
     }
 
-    .dropdown-container {
+    form {
       display: flex;
       flex-direction: column;
       gap: 14px;
@@ -117,13 +101,8 @@
       display: inline-block;
     }
 
-    .input-wrapper {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    select, input[type="text"] {
+    input[type="text"],
+    input[type="password"] {
       width: 100%;
       padding: 12px 14px;
       border-radius: 10px;
@@ -134,34 +113,9 @@
       transition: box-shadow .15s, border-color .15s;
     }
 
-    select {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2308304a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      background-color: rgba(255,255,255,0.9);
-      padding-right: 40px;
-    }
-
-    select:focus, input:focus {
+    input:focus {
       box-shadow: 0 4px 14px rgba(14,165,233,0.12);
       border-color: var(--accent);
-    }
-
-    .image-container {
-      width: 60px;
-      height: 60px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .image-container img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
     }
 
     .actions {
@@ -195,75 +149,53 @@
       header { padding: 10px 16px; }
       .card { padding: 20px; }
       .nav-links a { margin-left: 10px; font-size: 14px; }
-      .site-title { font-size: 16px; }
-      .logo-container { gap: 10px; }
-      .input-wrapper {
-        flex-direction: column;
-      }
-      .image-container {
-        width: 100%;
-        height: 80px;
-      }
     }
   </style>
 </head>
 <body>
   <!-- Barra superior -->
   <header>
-    <!-- Logo y título -->
-    <div class="logo-container">
-      <img src="logo.png" alt="Logo" id="logo">
-      <span class="site-title">Telemetría Global</span>
-    </div>
+    <!-- Logo (puedes reemplazar el src por la ruta de tu imagen) -->
+    <img src="logo.png" alt="Logo" id="logo">
 
     <!-- Enlace a la página principal -->
     <nav class="nav-links">
-      <a href="login.html">Administrador</a>
+      <a href="index.html">Principal</a>
     </nav>
   </header>
 
   <!-- Contenido principal -->
   <main>
     <section class="card">
-      <h1>Seleccione Manifold</h1>
-      <p class="lead">Seleccione ubicación de Manifold dentro de la lista desplegable.</p>
+      <h1>Inicio de sesión</h1>
+      <p class="lead">Introduce tu usuario y contraseña para acceder.</p>
 
-      <div class="dropdown-container">
+      <form action="#" method="post" onsubmit="handleSubmit(event)">
         <div>
-          <label for="dropdown">Opciones disponibles</label>
-          <div class="input-wrapper">
-            <select id="dropdown" name="dropdown">
-              <option value="" selected disabled>Seleccione Manifold</option>
-              <option value="" disabled>No hay Manifolds registrados</option>
-            </select>
-            <div class="image-container">
-              <img src="manifold.png" alt="Manifold">
-            </div>
-          </div>
+          <label for="user">Usuario</label>
+          <input id="user" name="user" type="text" autocomplete="username" required placeholder="Usuario">
         </div>
 
         <div>
-          <label for="serial">Número de serie</label>
-          <div class="input-wrapper">
-            <input id="serial" name="serial" type="text" required placeholder="Ingrese número de serie">
-            <div class="image-container" style="visibility: hidden;">
-              <!-- Espacio reservado para mantener la alineación -->
-              <img src="manifold.png" alt="Manifold">
-            </div>
-          </div>
+          <label for="pass">Contraseña</label>
+          <input id="pass" name="password" type="password" autocomplete="current-password" required placeholder="••••••••">
         </div>
 
         <div class="actions">
-          <span class="small">Contactenos</span>
-          <button type="button" disabled>Continuar</button>
+          <span class="small">¿Olvidaste tu contraseña?</span>
+          <button type="submit">Ingresar</button>
         </div>
-      </div>
+      </form>
     </section>
   </main>
 
   <script>
-    // Aquí puedes agregar la lógica para cargar opciones posteriormente
-    // Por ahora, el select solo muestra "No hay nada registrado"
+    function handleSubmit(e){
+      e.preventDefault();
+      const user = document.getElementById('user').value.trim();
+      const pass = document.getElementById('pass').value;
+      alert('Usuario: ' + user + '\\nContraseña: ' + (pass ? '●●●●●●●●●' : '(vacía)'));
+    }
   </script>
 </body>
 </html>
