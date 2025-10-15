@@ -12,17 +12,58 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         height: 100vh;
         gap: 30px;
+        margin: 0;
     }
+
+    /* --- Barra superior --- */
+    .navbar {
+        width: 100%;
+        background: #1e293b;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 40px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100;
+    }
+
+    .navbar h2 {
+        color: #38bdf8;
+        margin: 0;
+    }
+
+    .navbar button {
+        background: #0ea5e9;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+
+    .navbar button:hover {
+        background: #38bdf8;
+    }
+
     h1 {
         color: #38bdf8;
+        margin-top: 100px;
     }
+
     .container {
         display: flex;
         gap: 80px;
     }
+
     .panel {
         background: #1e293b;
         padding: 20px;
@@ -31,16 +72,20 @@
         width: 280px;
         box-shadow: 0 0 10px #0ea5e9;
     }
+
     .indicator {
         font-size: 1.2em;
         margin-bottom: 10px;
     }
+
     .ready {
         color: #22c55e;
     }
+
     .not-ready {
         color: #ef4444;
     }
+
     button {
         background: #0ea5e9;
         border: none;
@@ -50,9 +95,11 @@
         cursor: pointer;
         font-weight: bold;
     }
+
     button.active {
         background: #22c55e;
     }
+
     #manometro {
         width: 150px;
         height: 150px;
@@ -61,6 +108,7 @@
         position: relative;
         background: #0f172a;
     }
+
     #aguja {
         position: absolute;
         width: 3px;
@@ -72,6 +120,7 @@
         transform: rotate(-90deg);
         transition: transform 0.5s ease;
     }
+
     #alerta {
         background: #ef4444;
         padding: 10px 20px;
@@ -82,6 +131,12 @@
 </style>
 </head>
 <body>
+
+<!-- Barra superior -->
+<div class="navbar">
+    <h2>Panel de Monitoreo</h2>
+    <button onclick="window.location.href='index.html'">Inicio</button>
+</div>
 
 <h1>Monitoreo de Presión - Generador y Bancada</h1>
 
@@ -169,7 +224,7 @@ function actualizarEstado(psiGenerador, psiBancada) {
     alerta.style.display = error ? "block" : "none";
 }
 
-/* Simulación o conexión con Adafruit IO */
+/* Conexión con Adafruit IO */
 async function obtenerDatos() {
     try {
         const resGen = await fetch(`https://io.adafruit.com/api/v2/${ADAFRUIT_USERNAME}/feeds/${FEED_GENERADOR}/data?limit=1`, {
